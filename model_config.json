@@ -1,0 +1,19 @@
+{
+  "model_path": "helmet_model/best.pt",
+  "classes": [
+    "with helmet",
+    "without helmet",
+    "rider",
+    "number plate"
+  ],
+  "class_indices": {
+    "rider": 2,
+    "with_helmet": 0,
+    "without_helmet": 1,
+    "number_plate": 3
+  },
+  "conf_threshold": 0.35,
+  "iou_threshold": 0.45,
+  "imgsz": 640,
+  "ocr_language": "en"
+}

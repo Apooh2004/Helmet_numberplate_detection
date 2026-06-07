@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: {% if result.violation == 'No violation detected' %}linear-gradient(135deg, #a8e6cf 0%, #dcedc8 100%){% else %}linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%){% endif %};
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            animation: slideUp 0.8s ease-out;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card-header {
+            background: {% if result.violation == 'No violation detected' %}linear-gradient(45deg, #28a745, #20c997){% else %}linear-gradient(45deg, #dc3545, #fd7e14){% endif %};
+            border-radius: 20px 20px 0 0 !important;
+            border: none;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .status-icon {
+            font-size: 3rem;
+            animation: bounce 1s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        .card-body {
+            padding: 2.5rem;
+        }
+        .alert {
+            border-radius: 15px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            animation: alertPulse 2s ease-in-out;
+        }
+        @keyframes alertPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .number-plate-section {
+            background: rgba(0, 123, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .number-plate-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #007bff;
+            display: inline-block;
+        }
+        .image-section {
+            text-align: center;
+            margin: 2rem 0;
+            animation: fadeInUp 1s ease-out 1s both;
+        }
+        .annotated-image {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+        .annotated-image:hover {
+            transform: scale(1.02);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 123, 255, 0.4);
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    {% if result.violation == 'No violation detected' %}
+                        <i class="fas fa-check-circle status-icon"></i>
+                        Compliance Detected
+                    {% else %}
+                        <i class="fas fa-exclamation-triangle status-icon"></i>
+                        Violation Detected
+                    {% endif %}
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert {% if result.violation == 'No violation detected' %}alert-success{% else %}alert-danger{% endif %}">
+                    <i class="fas {% if result.violation == 'No violation detected' %}fa-shield-alt{% else %}fa-times-circle{% endif %} me-2"></i>
+                    {{ result.violation }}
+                </div>
+                
+                {% if result.number_plate %}
+                <div class="number-plate-section">
+                    <h5 class="mb-3">
+                        <i class="fas fa-id-card me-2"></i>Extracted Number Plate
+                    </h5>
+                    <div class="number-plate-text">{{ result.number_plate }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-box" style="background-color: #00FF00;"></div>
+                        <span>Helmet (No Violation)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background-color: #0000FF;"></div>
+                        <span>Number Plate</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background-color: #FF0000;"></div>
+                        <span>Without Helmet / Rider</span>
+                    </div>
+                </div>
+                
+                <div class="image-section">
+                    <h5 class="mb-3">
+                        <i class="fas fa-image me-2"></i>Analysis Result
+                    </h5>
+                    <img src="{{ url_for('static', filename=result.annotated_image) }}" class="img-fluid annotated-image" alt="Annotated Image">
+                </div>
+                
+                <div class="text-center">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Analyze Another Image
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
